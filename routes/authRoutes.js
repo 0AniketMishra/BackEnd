@@ -125,14 +125,10 @@ router.post('/userdata', (req, res) => {
     const { email } = req.body;
     User.findOne({ email: email })
         .then(savedUser => {
-            if (savedUser == null) {
-                return res.status(422).json({ error: "Invaild Credentials" })
-            }
-            else {
                 res.status(200).json({ message: 'User Found', savedUser })
-            }
         })
 })
+
 router.post('/finduser', (req, res) => {
     const { keyword } = req.body;
     User.find({ username: { $regex: keyword, $options: 'i' } })
