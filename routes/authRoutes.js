@@ -198,8 +198,31 @@ router.post('/followuser', (req, res) => {
                 })
         })
 })
+router.post('/likepost', (req, res) => {
+    const { postid, email } = req.body;
 
+    Post.findOne({ _id: postid })
+        .then(postinfo => {
+           postinfo.likes.push(email)
+           postinfo.save()
+           res.status(200).send({
+            message: 'Post Liked'
+        })
+        })
+})
 
+router.post('/unlikepost', (req, res) => {
+    const { postid, email } = req.body;
+
+    Post.findOne({ _id: postid })
+        .then(postinfo => {
+           postinfo.likes.pull(email)
+           postinfo.save()
+           res.status(200).send({
+            message: 'Post Unliked'
+        })
+        })
+})
 
 router.post('/unfollowuser', (req, res) => {
     const { unfollowfrom, unfollowto } = req.body;
