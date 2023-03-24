@@ -142,7 +142,20 @@ router.post('/finduser', (req, res) => {
 
         })
 })
+router.post('/userposts', (req, res) => {
+    const { email } = req.body;
+    Post.find({email : email})
+        .then(post => {
+                 res.status(200).send({
+                    message: "Posts Found",
+                    post: post 
+                })
+            
+
+        })
+})
 router.post('/allposts', (req, res) => {
+    
     Post.find({})
         .then(post => {
                  res.status(200).send({
