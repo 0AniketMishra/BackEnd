@@ -37,7 +37,7 @@ const postSchema = new mongoose.Schema({
         type: String,
         default: ''
     },
-    replyingId: {
+    replyingEmail: {
         type: String,
         default: ''
     },
