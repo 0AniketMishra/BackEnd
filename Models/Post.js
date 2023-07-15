@@ -37,6 +37,10 @@ const postSchema = new mongoose.Schema({
         type: String,
         default: ''
     },
+    replyingId: {
+        type: String,
+        default: ''
+    },
 
 })
 mongoose.model("Post",postSchema)
