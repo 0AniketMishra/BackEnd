@@ -166,6 +166,19 @@ router.post('/allposts', (req, res) => {
 
         })
 })
+router.post('/postdata', (req, res) => {
+    const { postId } = req.body;
+    
+    Post.find({_id: postId})
+        .then(post => {
+                 res.status(200).send({
+                    message: "Post Found",
+                    post: post 
+                })
+            
+
+        })
+})
 
 router.post('/checkfollow', (req, res) => {
     const { followfrom, followto } = req.body
