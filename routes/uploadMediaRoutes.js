@@ -28,7 +28,7 @@ const nodemailer = require('bcrypt')
 //     })
 // })
 router.post("/addpost", async (req, res) => {
-    const {  posttext, email,image1, image2, image3,image4,replyingTo } = req.body;
+    const {  posttext, email,image1, image2, image3,image4,replyingTo,replyingOn } = req.body;
   
     if (!posttext || !email) {
         return res.status(422).json({ error: 'please add all the fields' })
@@ -42,6 +42,7 @@ router.post("/addpost", async (req, res) => {
             image3,
             image4,
             replyingTo,
+            replyingOn,
         })
         try {
             await post.save();

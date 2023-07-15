@@ -29,6 +29,10 @@ const postSchema = new mongoose.Schema({
         type: Array,
         default: []
     },
+    replyingOn: {
+        type: String,
+        default: ''
+    },
     replyingTo: {
         type: String,
         default: ''
