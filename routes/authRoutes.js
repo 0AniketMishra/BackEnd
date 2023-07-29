@@ -211,7 +211,8 @@ router.post('/followuser', (req, res) => {
         return res.status(422).json({ error: "Invalid Credentials" })
     }
 
-    User.findOne({ email: followfrom })
+   try{
+        User.findOne({ email: followfrom })
         .then(mainuser => {
            mainuser.following.push(followto)
         })
@@ -223,6 +224,11 @@ router.post('/followuser', (req, res) => {
                     message: 'User Followed'
                 })
         })
+   }catch(err){
+       res.status(200).send({
+           messsage: err
+       })
+   }
 })
 router.post('/likepost', (req, res) => {
     const { postid, email } = req.body;
