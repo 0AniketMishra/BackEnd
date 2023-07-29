@@ -226,7 +226,7 @@ router.post('/followuser', (req, res) => {
         })
    }catch(err){
        res.status(200).send({
-           messsage: err
+           messsage: "You are at the right track"
        })
    }
 })
