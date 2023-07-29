@@ -206,29 +206,21 @@ router.post('/checkfollow', (req, res) => {
 
 router.post('/followuser', (req, res) => {
     const { followfrom, followto } = req.body;
-
     if (!followfrom || !followto) {
-        return res.status(422).json({ error: "Invalid Credentials" })
+        return res.status(422).json({ error: "Invalid Credentials" });
     }
+User.findOne({ email: followfrom }).then(mainuser => {        
+  mainuser.following.push(followto);
+  mainuser.save();
 
-   try{
-        User.findOne({ email: followfrom })
-        .then(mainuser => {
-           mainuser.following.push(followto)
-        })
-    User.findOne({ email: followto })
-        .then(otheruser => {
-                otheruser.followers.push(followfrom)
-                otheruser.save()
-                res.status(200).send({
-                    message: 'User Followed'
-                })
-        })
-   }catch(err){
-       res.status(200).send({
-           messsage: "You are at the right track"
-       })
-   }
+ User.findOne({ email: followto }).then(otheruser => {
+      otheruser.followers.push(followfrom);
+      otheruser.save()
+      res.status(200).send({
+      message: "User Followed"
+    })
+    })
+})
 })
 router.post('/likepost', (req, res) => {
     const { postid, email } = req.body;
@@ -258,26 +250,33 @@ router.post('/unlikepost', (req, res) => {
 
 router.post('/unfollowuser', (req, res) => {
     const { unfollowfrom, unfollowto } = req.body;
-
     if (!unfollowfrom || !unfollowto) {
-        return res.status(422).json({ error: "Invalid Credentials" })
+        return res.status(422).json({ error: "Invalid Credentials" });
     }
-
     User.findOne({ email: unfollowfrom })
         .then(mainuser => {
-                mainuser.following.pull(unfollowto)
-        })
-    User.findOne({ email: unfollowto })
-        .then(otheruser => {
-           
-                otheruser.followers.pull(unfollowfrom)
-                otheruser.save()
-                res.status(200).send({
-                    message: 'User Unfollowed'
-                })
             
-        })
-})
+                if (mainuser.following.includes(unfollowto)) {
+                    let index = mainuser.following.indexOf(unfollowto);
+                    mainuser.following.splice(index, 1);
+                    mainuser.save();
+
+                    User.findOne(
+                        { email: unfollowto }
+                    )
+                        .then(otheruser => {
+                           
+                                if (otheruser.followers.includes(unfollowfrom)) {
+                                    let index = otheruser.followers.indexOf(unfollowfrom);
+                                    otheruser.followers.splice(index, 1);
+                                    otheruser.save();
+                                }
+                                res.status(200).send({
+                                    message: "User Unfollowed"
+                                })
+                        })
+                }
+})})
 
 
 module.exports = router; 
