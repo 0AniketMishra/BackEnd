@@ -166,6 +166,18 @@ router.post('/allposts', (req, res) => {
 
         })
 })
+router.post('/getreplies', (req, res) => {
+    const { _id } = req.body;
+    Post.find({replyingTo: _id})
+        .then(post => {
+                 res.status(200).send({
+                    message: "Posts Found",
+                    post: post 
+                })
+            
+
+        })
+})
 router.post('/postdata', (req, res) => {
     const { postId } = req.body;
     
