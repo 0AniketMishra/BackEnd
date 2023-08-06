@@ -185,7 +185,7 @@ router.post('/postdata', (req, res) => {
         .then(post => {
                  res.status(200).send({
                     message: "Post Found",
-                    post: post 
+                    post: post[0]
                 })
             
 
