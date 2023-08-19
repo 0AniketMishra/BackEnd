@@ -66,23 +66,23 @@ router.post('/verify', (req, res) => {
 router.post("/signup", async (req, res) => {
     const { username, password, email } = req.body;
     const lowerUsername = '@' + username.replace(/\s+/g, '').toLowerCase()
-    
- 
-        const user = new User({
-            username,
-            email,
-            lowerUsername, 
-            password
-        })
-        try {
-            await user.save();
-            const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET);
-            return res.status(200).json({ message: "User Registered Successfully!", token })
-        } catch (err) {
-            console.log(err);
-            return res.status(422).json({ error: 'Error Registering User!' })
-        }
-    
+
+
+    const user = new User({
+        username,
+        email,
+        lowerUsername,
+        password
+    })
+    try {
+        await user.save();
+        const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET);
+        return res.status(200).json({ message: "User Registered Successfully!", token })
+    } catch (err) {
+        console.log(err);
+        return res.status(422).json({ error: 'Error Registering User!' })
+    }
+
 })
 router.post('/signin', (req, res) => {
     const { email, password } = req.body;
@@ -97,7 +97,7 @@ router.post('/signin', (req, res) => {
                     return res.status(422).json({ error: "Invalid Credentials" });
                 }
                 else {
-             
+
                     bcrypt.compare(password, savedUser.password)
                         .then(
                             doMatch => {
@@ -125,7 +125,7 @@ router.post('/userdata', (req, res) => {
     const { email } = req.body;
     User.findOne({ email: email })
         .then(savedUser => {
-                res.status(200).json({ message: 'User Found', savedUser })
+            res.status(200).json({ message: 'User Found', savedUser })
         })
 })
 
@@ -133,61 +133,61 @@ router.post('/finduser', (req, res) => {
     const { keyword } = req.body;
     User.find({ username: { $regex: keyword, $options: 'i' } })
         .then(user => {
-        
-                return res.status(200).send({
-                    message: "User Found",
-                    user: user
-                })
-    
+
+            return res.status(200).send({
+                message: "User Found",
+                user: user
+            })
+
 
         })
 })
 router.post('/userposts', (req, res) => {
     const { email } = req.body;
-    Post.find({email : email})
+    Post.find({ email: email })
         .then(post => {
-                 res.status(200).send({
-                    message: "Posts Found",
-                    post: post 
-                })
-            
+            res.status(200).send({
+                message: "Posts Found",
+                post: post
+            })
+
 
         })
 })
 router.post('/allposts', (req, res) => {
-    
+
     Post.find({})
         .then(post => {
-                 res.status(200).send({
-                    message: "Posts Found",
-                    post: post 
-                })
-            
+            res.status(200).send({
+                message: "Posts Found",
+                post: post
+            })
+
 
         })
 })
 router.post('/getreplies', (req, res) => {
     const { _id } = req.body;
-    Post.find({replyingTo: _id})
+    Post.find({ replyingTo: _id })
         .then(post => {
-                 res.status(200).send({
-                    message: "Posts Found",
-                    post: post 
-                })
-            
+            res.status(200).send({
+                message: "Posts Found",
+                post: post
+            })
+
 
         })
 })
 router.post('/postdata', (req, res) => {
     const { postId } = req.body;
-    
-    Post.find({_id: postId})
+
+    Post.find({ _id: postId })
         .then(post => {
-                 res.status(200).send({
-                    message: "Post Found",
-                    post: post[0]
-                })
-            
+            res.status(200).send({
+                message: "Post Found",
+                post: post[0]
+            })
+
 
         })
 })
@@ -221,53 +221,68 @@ router.post('/followuser', (req, res) => {
     if (!followfrom || !followto) {
         return res.status(422).json({ error: "Invalid Credentials" });
     }
-User.findOne({ email: followfrom }).then(mainuser => {        
-  mainuser.following.push(followto);
-  mainuser.save();
+    User.findOne({ email: followfrom }).then(mainuser => {
+        mainuser.following.push(followto);
+        mainuser.save();
 
- User.findOne({ email: followto }).then(otheruser => {
-      otheruser.followers.push(followfrom);
-      otheruser.save()
-      res.status(200).send({
-      message: "User Followed"
+        User.findOne({ email: followto }).then(otheruser => {
+            otheruser.followers.push(followfrom);
+            otheruser.save()
+            res.status(200).send({
+                message: "User Followed"
+            })
+        })
     })
+})
+router.post('/editprofile', (req, res) => {
+    const { _id, username, profile, lowerusername, description } = req.body;
+    User.findOne({ _id: _id })
+        .then(async (user) => {
+            user.username = username
+            user.profile = profile
+            user.lowerusername = lowerusername
+            user.description = description
+            user.save()
+                .then(user => {
+                    res.json({ message: "Profile Edited Succesfully" });
+                 })
+
+        })
+})
+    router.post('/likepost', (req, res) => {
+        const { postid, email } = req.body;
+
+        Post.findOne({ _id: postid })
+            .then(postinfo => {
+                postinfo.likes.push(email)
+                postinfo.save()
+                res.status(200).send({
+                    message: 'Post Liked'
+                })
+            })
     })
-})
-})
-router.post('/likepost', (req, res) => {
-    const { postid, email } = req.body;
 
-    Post.findOne({ _id: postid })
-        .then(postinfo => {
-           postinfo.likes.push(email)
-           postinfo.save()
-           res.status(200).send({
-            message: 'Post Liked'
-        })
-        })
-})
+    router.post('/unlikepost', (req, res) => {
+        const { postid, email } = req.body;
 
-router.post('/unlikepost', (req, res) => {
-    const { postid, email } = req.body;
+        Post.findOne({ _id: postid })
+            .then(postinfo => {
+                postinfo.likes.pull(email)
+                postinfo.save()
+                res.status(200).send({
+                    message: 'Post Unliked'
+                })
+            })
+    })
 
-    Post.findOne({ _id: postid })
-        .then(postinfo => {
-           postinfo.likes.pull(email)
-           postinfo.save()
-           res.status(200).send({
-            message: 'Post Unliked'
-        })
-        })
-})
+    router.post('/unfollowuser', (req, res) => {
+        const { unfollowfrom, unfollowto } = req.body;
+        if (!unfollowfrom || !unfollowto) {
+            return res.status(422).json({ error: "Invalid Credentials" });
+        }
+        User.findOne({ email: unfollowfrom })
+            .then(mainuser => {
 
-router.post('/unfollowuser', (req, res) => {
-    const { unfollowfrom, unfollowto } = req.body;
-    if (!unfollowfrom || !unfollowto) {
-        return res.status(422).json({ error: "Invalid Credentials" });
-    }
-    User.findOne({ email: unfollowfrom })
-        .then(mainuser => {
-            
                 if (mainuser.following.includes(unfollowto)) {
                     let index = mainuser.following.indexOf(unfollowto);
                     mainuser.following.splice(index, 1);
@@ -277,18 +292,19 @@ router.post('/unfollowuser', (req, res) => {
                         { email: unfollowto }
                     )
                         .then(otheruser => {
-                           
-                                if (otheruser.followers.includes(unfollowfrom)) {
-                                    let index = otheruser.followers.indexOf(unfollowfrom);
-                                    otheruser.followers.splice(index, 1);
-                                    otheruser.save();
-                                }
-                                res.status(200).send({
-                                    message: "User Unfollowed"
-                                })
+
+                            if (otheruser.followers.includes(unfollowfrom)) {
+                                let index = otheruser.followers.indexOf(unfollowfrom);
+                                otheruser.followers.splice(index, 1);
+                                otheruser.save();
+                            }
+                            res.status(200).send({
+                                message: "User Unfollowed"
+                            })
                         })
                 }
-})})
+            })
+    })
 
 
-module.exports = router; 
+    module.exports = router; 
