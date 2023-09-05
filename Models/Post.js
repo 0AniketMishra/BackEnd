@@ -29,18 +29,6 @@ const postSchema = new mongoose.Schema({
         type: Array,
         default: []
     },
-    replyingOn: {
-        type: String,
-        default: ''
-    },
-    replyingTo: {
-        type: String,
-        default: ''
-    },
-    replyingEmail: {
-        type: String,
-        default: ''
-    },
 
 })
 mongoose.model("Post",postSchema)
